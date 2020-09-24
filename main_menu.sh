@@ -2,28 +2,27 @@
 ###
  # @Date: 2020-09-22 20:53:02
  # @LastEditors: ECarry
- # @LastEditTime: 2020-09-23 10:59:19
+ # @LastEditTime: 2020-09-23 23:17:27
  # @Description: 配置 linux 
 ### 
 
 set -e
 
-# Only CentOS7 can run it.
+# Only CentOS/RedHat can run it.
 function check_os(){
-    if(($1 == 1))
-    then
-        platform=`uname -i`
-        if [ $platform != "x86_64" ];then
-        echo "this script is only for 64bit Operating System !"
-        exit 1
-        fi
-        echo "the platform is ok"
-        version=`lsb_release -r |awk '{print substr($2,1,1)}'`
-        if [ $version != 6 ];then
-        echo "this script is only for CentOS 6 !"
-        exit 1
-        fi
-    fi
+
+  platform=`uname -i`
+  if [ $platform != "x86_64" ];then
+  echo "this script is only for 64bit Operating System !"
+  exit 1
+  fi
+  echo "the platform is ok"
+  sleep 2 
+  if [ ! -f /etc/redhat-release ];then
+  echo "this script is only for CentOS/RedHat !"
+  exit 1
+  fi
+
 } 
 
 # Only root can run it.
@@ -51,21 +50,6 @@ Console setup
 EOF
 }
 
-# 1) Netools Menu
-function Netools_meun(){
-cat <<EOF
-
-Netools 
--------------
-
-1) Configure Network Interfaces
-2) Configure DNS
-3) Restart Network
-4) Return
-
-EOF
-}
-
 # 2) Manage User Menu
 function Manage_User_meun(){
 cat <<EOF
@@ -88,7 +72,7 @@ function Yum_Config_meun(){
 cat <<EOF
 
 Yum Config
--------------
+------------- 
 
 1) Change Repo
 2) Yum Update
@@ -128,13 +112,20 @@ Power Off
 EOF
 }
 
-while :
+echo "Check OS, Please wait..."
+check_os
+clear
+filepath=$(cd "$(dirname "$0")"; pwd)
+
+index=-1
+
+Menu
+while (($index!=0))
 do
-  Menu
-  read -p "Enter an option from 1-11: " OPTION
-  case $OPTION in
+  read -p "Enter an option from 1-11: " index
+  case $index in
     1)
-    Netools_meun
+    $filepath/netools/show_netools_menu.sh
     ;;
     2)
     Manage_User_meun
