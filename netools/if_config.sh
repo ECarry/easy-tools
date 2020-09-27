@@ -2,7 +2,7 @@
 ###
  # @Date: 2020-09-23 10:50:50
  # @LastEditors: ECarry
- # @LastEditTime: 2020-09-27 09:40:39
+ # @LastEditTime: 2020-09-27 09:58:50
  # @Description: 
 ### 
 
@@ -32,7 +32,22 @@ function if_config(){
 
     nmcli connection modify $option_if ipv4.addresses $IPADD ipv4.gateway $GATEWAY ipv4.method manual connection.autoconnect yes
     
-      
+    echo "IPADDR=$IPADD"  
+    echo "GATEWAY=$GATEWAY"
+    
+    read -p "Restart network (y|n) ?" RES
+
+    case $RES in
+    y)
+    systemctl restart network
+    if [ $? -eq 0 ]
+    then
+      echo "Network restart successful."
+      exit 0
+    else
+      echo "Network restart fault."
+      exit 1
+    fi
 }
 
 if_config
