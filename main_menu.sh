@@ -2,25 +2,32 @@
 ###
  # @Date: 2020-09-22 20:53:02
  # @LastEditors: ECarry
- # @LastEditTime: 2020-09-23 23:17:27
+ # @LastEditTime: 2020-09-27 09:18:25
  # @Description: 配置 linux 
 ### 
 
 set -e
 
-# Only CentOS/RedHat can run it.
+# Only CentOS/RedHat7 can run it.
 function check_os(){
 
   platform=`uname -i`
-  if [ $platform != "x86_64" ];then
-  echo "this script is only for 64bit Operating System !"
-  exit 1
+  if [ $platform != "x86_64" ]
+  then
+    echo "this script is only for 64bit Operating System !"
+    exit 1
   fi
-  echo "the platform is ok"
-  sleep 2 
-  if [ ! -f /etc/redhat-release ];then
-  echo "this script is only for CentOS/RedHat !"
-  exit 1
+  
+  if [ ! -f /etc/redhat-release ] 
+  then
+    echo "this script is only for CentOS/RedHat 7 !"
+    exit 1
+  fi
+  
+  if ! cat /etc/redhat-release | grep "7.[0-9]" &> /dev/null
+  then
+    echo "this script is only for CentOS/RedHat 7 !"
+    exit 1
   fi
 
 } 
@@ -50,97 +57,38 @@ Console setup
 EOF
 }
 
-# 2) Manage User Menu
-function Manage_User_meun(){
-cat <<EOF
-
-Manage User
--------------
-
-1) Add User
-2) Change Passwd
-3) Add Group
-4) Authorization
-5) SSH
-6) Return
-
-EOF
-}
-
-# 3) Yum Config Menu
-function Yum_Config_meun(){
-cat <<EOF
-
-Yum Config
-------------- 
-
-1) Change Repo
-2) Yum Update
-3) Return
-
-EOF
-}
-
-# 4) Manage App Menu
-function Service_Install_meun(){
-cat <<EOF
-
-Manage App
--------------
-
-1) Install Nginx
-2) Install Docker
-3) Install Zabbix
-4) Install MySQL
-5) Install Python3
-6) Return
-
-EOF
-}
-
-# 5) Power Off Menu
-function Power_Off_meun(){
-cat <<EOF
-
-Power Off
--------------
-
-1) Reboot
-2) Power Off
-3) Return
-
-EOF
-}
-
 echo "Check OS, Please wait..."
 check_os
-clear
+sleep 1
+
 filepath=$(cd "$(dirname "$0")"; pwd)
 
 index=-1
 
-Menu
 while (($index!=0))
 do
-  read -p "Enter an option from 1-11: " index
+  clear
+  Menu
+  read -p "Enter an option from 1-6: " index
   case $index in
     1)
     $filepath/netools/show_netools_menu.sh
     ;;
     2)
-    Manage_User_meun
+    $filepath/manage_user/show_manage_user_menu.sh
     ;;
     3)
-    Yum_Config_meun
+    $filepath/yum_config/show_yum_menu.sh
     ;;
     4)
-    Service_Install_meun
+    $filepath/manage_app/show_manage_app.sh
     ;;
     5)
-    Power_Off_meun
+    $filepath/power/show_power_menu.sh
     ;;
     6)
-    break
+    clear
+    exit 0
     ;;
   esac
-done
+done 
