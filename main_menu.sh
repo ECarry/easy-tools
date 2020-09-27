@@ -2,7 +2,7 @@
 ###
  # @Date: 2020-09-22 20:53:02
  # @LastEditors: ECarry
- # @LastEditTime: 2020-09-27 09:18:25
+ # @LastEditTime: 2020-09-27 10:52:45
  # @Description: 配置 linux 
 ### 
 
@@ -24,7 +24,7 @@ function check_os(){
     exit 1
   fi
   
-  if ! cat /etc/redhat-release | grep "7.[0-9]" &> /dev/null
+  if ! cat /etc/redhat-release | cut -d " " -f4 | grep "^7.[0-9]" &> /dev/null
   then
     echo "this script is only for CentOS/RedHat 7 !"
     exit 1
