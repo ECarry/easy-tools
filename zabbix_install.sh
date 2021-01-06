@@ -54,11 +54,32 @@ setenforce 0
 sed -i 's/SELINUX=enforcing/SELINUX=disabled/' /etc/selinux/config
 
 # 替换官方源为 阿里源
-rpm -Uvh https://mirrors.aliyun.com/zabbix/zabbix/5.0/rhel/7/x86_64/zabbix-release-5.2-1.el7.noarch.rpm && sed -i 's@http://repo.zabbix.com@https://mirrors.aliyun.com/zabbix@' /etc/yum.repos.d/zabbix.repo
-yum clean all
+rpm -Uvh https://mirrors.aliyun.com/zabbix/zabbix/5.2/rhel/7/x86_64/zabbix-release-5.2-1.el7.noarch.rpm && sed -i 's@http://repo.zabbix.com@https://mirrors.aliyun.com/zabbix@' /etc/yum.repos.d/zabbix.repo && yum clean all
 
 # 安装 zabbix server 和 agent
 yum install zabbix-server-mysql zabbix-agent -y
 
-#安装 Software Collections
+# 安装 Software Collections
 yum install centos-release-scl -y
+
+# 修改 vi /etc/yum.repos.d/zabbix.repo，将 [zabbix-frontend] 下的 enabled=1
+sed -i "11c enable=1" /etc/yum.repos.d/zabbix.repo
+
+# 判断是否修改成功
+FRONTEND_STATUS=`cat /etc/yum.repos.d/zabbix.repo |grep -A 5 "^\[zabbix-frontend\]"|grep enabled`
+if [ $FRONTEND_STATUS != "enabled=1" ]
+then 
+  echo "edit /etc/yum.repos.d/zabbix.repo"
+  echo "[zabbix-frontend] enabled=1"
+  echo "faild,exit...."
+  exit
+fi
+
+# 安装 zabbix 前端和相关环境
+yum install zabbix-web-mysql-scl zabbix-apache-conf-scl -y &>> install.log
+if [ ! $? -eq 0 ]
+then
+  echo "installation failed, please see install.log"
+  echo "exit..."
+  exit
+fi
